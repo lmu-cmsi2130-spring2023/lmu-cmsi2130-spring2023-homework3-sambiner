@@ -128,7 +128,7 @@ public class EditDistanceUtilsTests {
     public void transformList_t0() {
         String s0 = "",
                 s1 = "";
-        System.out.print("s0 -> s1 = ");
+        System.out.print("Test 0 s0 -> s1 = ");
         System.out.println(getTransformationList(s0, s1));
         assertEquals(Arrays.asList(), getTransformationList(s0, s1));
     }
@@ -137,9 +137,9 @@ public class EditDistanceUtilsTests {
     public void transformList_t1() {
         String s0 = "a",
                 s1 = "";
-        System.out.print("s0 -> s1 = ");
+        System.out.print("Test 1 s0 -> s1 = ");
         System.out.println(getTransformationList(s0, s1));
-        System.out.print("s1 -> s0 = ");
+        System.out.print("Test 1 s1 -> s0 = ");
         System.out.println(getTransformationList(s1, s0));
         assertEquals(Arrays.asList("D"), getTransformationList(s0, s1));
         assertEquals(Arrays.asList("I"), getTransformationList(s1, s0));
@@ -149,9 +149,9 @@ public class EditDistanceUtilsTests {
     public void transformList_t2() {
         String s0 = "abc",
                 s1 = "";
-        System.out.print("s0 -> s1 = ");
+        System.out.print("Test 2 s0 -> s1 = ");
         System.out.println(getTransformationList(s0, s1));
-        System.out.print("s1 -> s0 = ");
+        System.out.print("Test 2 s1 -> s0 = ");
         System.out.println(getTransformationList(s1, s0));
         assertEquals(Arrays.asList("D", "D", "D"), getTransformationList(s0, s1));
         assertEquals(Arrays.asList("I", "I", "I"), getTransformationList(s1, s0));
@@ -161,9 +161,9 @@ public class EditDistanceUtilsTests {
     public void transformList_t3() {
         String s0 = "abc",
                 s1 = "bac";
-        System.out.print("s0 -> s1 = ");
+        System.out.print("Test 3 s0 -> s1 = ");
         System.out.println(getTransformationList(s0, s1));
-        System.out.print("s1 -> s0 = ");
+        System.out.print("Test 3 s1 -> s0 = ");
         System.out.println(getTransformationList(s1, s0));
         assertEquals(Arrays.asList("T"), getTransformationList(s0, s1));
         assertEquals(Arrays.asList("T"), getTransformationList(s1, s0));
@@ -173,9 +173,9 @@ public class EditDistanceUtilsTests {
     public void transformList_t4() {
         String s0 = "aaa",
                 s1 = "bbb";
-        System.out.print("s0 -> s1 = ");
+        System.out.print("Test 4 s0 -> s1 = ");
         System.out.println(getTransformationList(s0, s1));
-        System.out.print("s1 -> s0 = ");
+        System.out.print("Test 4 s1 -> s0 = ");
         System.out.println(getTransformationList(s1, s0));
         assertEquals(Arrays.asList("R", "R", "R"), getTransformationList(s0, s1));
         assertEquals(Arrays.asList("R", "R", "R"), getTransformationList(s1, s0));
@@ -185,9 +185,9 @@ public class EditDistanceUtilsTests {
     public void transformList_t5() {
         String s0 = "eagle",
                 s1 = "bagle";
-        System.out.print("s0 -> s1 = ");
+        System.out.print("Test 5 s0 -> s1 = ");
         System.out.println(getTransformationList(s0, s1));
-        System.out.print("s1 -> s0 = ");
+        System.out.print("Test 5 s1 -> s0 = ");
         System.out.println(getTransformationList(s1, s0));
         assertEquals(Arrays.asList("R"), getTransformationList(s0, s1));
         assertEquals(Arrays.asList("R"), getTransformationList(s1, s0));
@@ -197,9 +197,9 @@ public class EditDistanceUtilsTests {
     public void transformList_t6() {
         String s0 = "hack",
                 s1 = "fkc";
-        System.out.print("s0 -> s1 = ");
+        System.out.print("Test 6 s0 -> s1 = ");
         System.out.println(getTransformationList(s0, s1));
-        System.out.print("s1 -> s0 = ");
+        System.out.print("Test 6 s1 -> s0 = ");
         System.out.println(getTransformationList(s1, s0));
         assertEquals(Arrays.asList("T", "R", "D"), getTransformationList(s0, s1));
         assertEquals(Arrays.asList("T", "R", "I"), getTransformationList(s1, s0));
@@ -209,9 +209,9 @@ public class EditDistanceUtilsTests {
     public void transformList_t7() {
         String s0 = "intuition",
                 s1 = "inception";
-        System.out.print("s0 -> s1 = ");
+        System.out.print("Test 7 s0 -> s1 = ");
         System.out.println(getTransformationList(s0, s1));
-        System.out.print("s1 -> s0 = ");
+        System.out.print("Test 7 s1 -> s0 = ");
         System.out.println(getTransformationList(s1, s0));
         assertEquals(Arrays.asList("R", "R", "R"), getTransformationList(s0, s1));
         assertEquals(Arrays.asList("R", "R", "R"), getTransformationList(s1, s0));
@@ -221,9 +221,9 @@ public class EditDistanceUtilsTests {
     public void transformList_t8() {
         String s0 = "astound",
                 s1 = "distant";
-        System.out.print("s0 -> s1 = ");
+        System.out.print("Test 8 s0 -> s1 = ");
         System.out.println(getTransformationList(s0, s1));
-        System.out.print("s1 -> s0 = ");
+        System.out.print("Test 8 s1 -> s0 = ");
         System.out.println(getTransformationList(s1, s0));
         assertEquals(Arrays.asList("R", "R", "D", "R", "I"), getTransformationList(s0, s1));
         assertEquals(Arrays.asList("R", "R", "I", "R", "D"), getTransformationList(s1, s0));
@@ -233,9 +233,9 @@ public class EditDistanceUtilsTests {
     public void transformList_t9() {
         String s0 = "housemaid",
                 s1 = "heartsick";
-        System.out.print("s0 -> s1 = ");
+        System.out.print("Test 9 s0 -> s1 = ");
         System.out.println(getTransformationList(s0, s1));
-        System.out.print("s1 -> s0 = ");
+        System.out.print("Test 9 s1 -> s0 = ");
         System.out.println(getTransformationList(s1, s0));
         assertEquals(Arrays.asList("R", "R", "R", "R", "R", "R", "R", "R"), getTransformationList(s0, s1));
         assertEquals(Arrays.asList("R", "R", "R", "R", "R", "R", "R", "R"), getTransformationList(s1, s0));
@@ -245,9 +245,9 @@ public class EditDistanceUtilsTests {
     public void transformList_t10() {
         String s0 = "fullness",
                 s1 = "fineness";
-        System.out.print("s0 -> s1 = ");
+        System.out.print("Test 10 s0 -> s1 = ");
         System.out.println(getTransformationList(s0, s1));
-        System.out.print("s1 -> s0 = ");
+        System.out.print("Test 10 s1 -> s0 = ");
         System.out.println(getTransformationList(s1, s0));
         assertEquals(Arrays.asList("R", "R", "R"), getTransformationList(s0, s1));
         assertEquals(Arrays.asList("R", "R", "R"), getTransformationList(s1, s0));
@@ -257,9 +257,9 @@ public class EditDistanceUtilsTests {
     public void transformList_t11() {
         String s0 = "axbczy",
                 s1 = "abxyzc";
-        System.out.print("s0 -> s1 = ");
+        System.out.print("Test 11 s0 -> s1 = ");
         System.out.println(getTransformationList(s0, s1));
-        System.out.print("s1 -> s0 = ");
+        System.out.print("Test 11 s1 -> s0 = ");
         System.out.println(getTransformationList(s1, s0));
         assertEquals(Arrays.asList("R", "R", "T"), getTransformationList(s0, s1));
         assertEquals(Arrays.asList("R", "R", "T"), getTransformationList(s1, s0));
