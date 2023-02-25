@@ -61,40 +61,57 @@ public class EditDistanceUtils {
      *         followed
      *         by a transposition, then insertion.
      */
+
     public static List<String> getTransformationList(String s0, String s1, int[][] table) {
-        List<String> list = new ArrayList<>();
-        int i = s0.length();
-        int j = s1.length();
-        while (i > 0 && j > 0) {
-            if (s0.charAt(i - 1) == s1.charAt(j - 1)) {
-                i--;
-                j--;
-            } else if (table[i][j] == table[i - 1][j - 1] + 1) {
-                list.add("R");
-                i--;
-                j--;
-            } else if (table[i][j] == table[i - 2][j - 2] + 1) {
-                list.add("T");
-                i -= 2;
-                j -= 2;
-            } else if (table[i][j] == table[i][j - 1] + 1) {
-                list.add("I");
-                j--;
-            } else if (table[i][j] == table[i - 1][j] + 1) {
-                list.add("D");
-                i--;
+        List<String> transformations = new ArrayList<>();
+        int m = s0.length();
+        int n = s1.length();
+        if (m == 0) {
+            for (int j = 0; j < n; j++) {
+                transformations.add("I");
             }
+            Collections.reverse(transformations);
+            return transformations;
         }
-        while (i > 0) {
-            list.add("D");
-            i--;
+        if (n == 0) {
+            for (int i = 0; i < m; i++) {
+                transformations.add("D");
+            }
+            Collections.reverse(transformations);
+            return transformations;
         }
-        while (j > 0) {
-            list.add("I");
-            j--;
+        if (s0.charAt(m - 1) == s1.charAt(n - 1)) {
+            transformations.addAll(getTransformationList(s0.substring(0, m - 1), s1.substring(0, n - 1), table));
+            Collections.reverse(transformations);
+            return transformations;
         }
-        Collections.reverse(list);
-        return list;
+        if (m > 1 && n > 1 && s0.charAt(m - 1) == s1.charAt(n - 2) && s0.charAt(m - 2) == s1.charAt(n - 1)) {
+            List<String> transposed = getTransformationList(s0.substring(0, m - 2), s1.substring(0, n - 2), table);
+            transposed.add("T");
+            Collections.reverse(transposed);
+            return transposed;
+        }
+
+        List<String> replace = getTransformationList(s0.substring(0, m - 1), s1.substring(0, n - 1), table);
+        replace.add("R");
+
+        List<String> insert = getTransformationList(s0, s1.substring(0, n - 1), table);
+        insert.add("I");
+
+        List<String> delete = getTransformationList(s0.substring(0, m - 1), s1, table);
+        delete.add("D");
+
+        int replaceScore = replace.size();
+        int insertScore = insert.size() + 1;
+        int deleteScore = delete.size() + 1;
+
+        if (replaceScore <= insertScore && replaceScore <= deleteScore) {
+            return replace;
+        } else if (insertScore < replaceScore && insertScore <= deleteScore) {
+            return insert;
+        } else {
+            return delete;
+        }
     }
 
     /**

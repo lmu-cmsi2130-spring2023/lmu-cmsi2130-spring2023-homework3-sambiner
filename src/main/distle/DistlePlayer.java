@@ -82,46 +82,73 @@ public class DistlePlayer {
         return this.word;
     }
 
+    /**
+     * @return The possible words that could be the secret word.
+     */
     private List<String> getPossibleWords() {
         List<String> possibleWords = new ArrayList<>();
+
         for (String w : this.dictionary) {
             if (getEditDistance(this.word, w) <= this.editDistance) {
                 possibleWords.add(w);
             }
         }
+
         return possibleWords;
     }
 
     private int getWordCount(String word) {
+
         if (!this.maxWordCounts.containsKey(word)) {
             int count = 0;
+
             for (String w : this.dictionary) {
                 if (getEditDistance(word, w) <= this.editDistance) {
                     count++;
                 }
             }
+
             this.maxWordCounts.put(word, count);
         }
+
         return this.maxWordCounts.get(word);
     }
 
+    /**
+     * Calculates the edit distance between two words. The edit distance is the
+     * number of edits needed to turn one word into the other. An edit can be one of
+     * the following:
+     * <ul>
+     * <li>Insertion of a character</li>
+     * <li>Deletion of a character</li>
+     * <li>Replacement of a character</li>
+     * <li>Transposition of two adjacent characters</li>
+     * </ul>
+     * 
+     * @param word1
+     * @param word2
+     * @return The edit distance between the two words.
+     */
     private int getEditDistance(String word1, String word2) {
         int m = word1.length();
         int n = word2.length();
-        int[][] dp = new int[m + 1][n + 1];
+        int[][] table = new int[m + 1][n + 1];
+
         for (int i = 0; i <= m; i++) {
-            dp[i][0] = i;
+            table[i][0] = 0;
         }
+
         for (int j = 0; j <= n; j++) {
-            dp[0][j] = j;
+            table[0][j] = 0;
         }
+
         for (int i = 1; i <= m; i++) {
             for (int j = 1; j <= n; j++) {
                 int cost = word1.charAt(i - 1) == word2.charAt(j - 1) ? 0 : 1;
-                dp[i][j] = Math.min(Math.min(dp[i - 1][j] + 1, dp[i][j - 1] + 1), dp[i - 1][j - 1] + cost);
+                table[i][j] = Math.min(Math.min(table[i - 1][j] + 1, table[i][j - 1] + 1), table[i - 1][j - 1] + cost);
             }
         }
-        return dp[m][n];
+        return table[m][n];
     }
 
     /**
@@ -151,21 +178,32 @@ public class DistlePlayer {
             this.minWords = new ArrayList<>();
             this.minWords.add(guess);
             Set<Character> excludeChars = new HashSet<>();
+            boolean excludeTransposed = false;
+
             for (String transform : transforms) {
                 if (transform.startsWith("-")) {
                     excludeChars.add(transform.charAt(1));
+                } else if (transform.equals("T")) {
+                    excludeTransposed = true;
                 }
             }
+
             Iterator<String> it = dictionary.iterator();
             while (it.hasNext()) {
                 String word = it.next();
+
                 for (char ch : excludeChars) {
                     if (word.indexOf(ch) >= 0) {
                         it.remove();
                         break;
                     }
                 }
+
+                if (excludeTransposed && getTransformationList(guess, word).contains("T")) {
+                    it.remove();
+                }
             }
+
         } else if (editDistance == this.editDistance) {
             this.minWords.add(guess);
         }
