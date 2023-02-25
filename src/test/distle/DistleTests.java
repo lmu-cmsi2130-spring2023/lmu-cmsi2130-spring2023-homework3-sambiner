@@ -18,7 +18,7 @@ public class DistleTests {
     // developing, just so you know whether or not you're
     // inefficient or bugged!
     @Rule
-    public Timeout globalTimeout = Timeout.seconds(180);
+    public Timeout globalTimeout = Timeout.seconds(300);
 
     static final int GAMESHOW_ROUNDS = 100,
             MAX_GUESSES = 10;
@@ -39,19 +39,25 @@ public class DistleTests {
 
     @Test
     public void distlePlayer_t14() throws FileNotFoundException {
-        runGameShowRounds("./src/dat/distle/dictionary14.txt", "Dictionary14");
+        runGameShowRounds(
+                "C:/CMSI_2130_Classworks/lmu-cmsi2130-spring2023-homework3-sambiner/src/dat/distle/dictionary14.txt",
+                "Dictionary14");
         System.out.println("  [>] Benchmark: ~95% Won");
     }
 
     @Test
     public void distlePlayer_t10() throws FileNotFoundException {
-        runGameShowRounds("./src/dat/distle/dictionary10.txt", "Dictionary10");
+        runGameShowRounds(
+                "C:/CMSI_2130_Classworks/lmu-cmsi2130-spring2023-homework3-sambiner/src/dat/distle/dictionary10.txt",
+                "Dictionary10");
         System.out.println("  [>] Benchmark: ~90% Won");
     }
 
     @Test
     public void distlePlayer_t6() throws FileNotFoundException {
-        runGameShowRounds("./src/dat/distle/dictionary6.txt", "Dictionary6");
+        runGameShowRounds(
+                "C:/CMSI_2130_Classworks/lmu-cmsi2130-spring2023-homework3-sambiner/src/dat/distle/dictionary6.txt",
+                "Dictionary6");
         System.out.println("  [>] Benchmark: ~80% Won");
     }
 

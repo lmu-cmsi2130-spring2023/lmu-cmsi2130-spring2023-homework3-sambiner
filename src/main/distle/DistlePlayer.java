@@ -10,11 +10,9 @@ import java.util.*;
 public class DistlePlayer {
 
     private Set<String> dictionary;
-    private int maxGuesses;
     private int guesses;
     private String word;
     private int editDistance;
-    private List<String> transforms;
     private List<String> minWords;
     private Map<String, Integer> maxWordCounts;
 
@@ -29,11 +27,10 @@ public class DistlePlayer {
      */
     public DistlePlayer() {
         this.dictionary = new HashSet<>();
-        this.maxGuesses = 0;
         this.guesses = 0;
         this.word = null;
         this.editDistance = Integer.MAX_VALUE;
-        this.transforms = new ArrayList<>();
+        new ArrayList<>();
         this.minWords = new ArrayList<>();
         this.maxWordCounts = new HashMap<>();
     }
@@ -49,11 +46,10 @@ public class DistlePlayer {
      */
     public void startNewGame(Set<String> dictionary, int maxGuesses) {
         this.dictionary = dictionary;
-        this.maxGuesses = maxGuesses;
         this.guesses = 0;
         this.word = null;
         this.editDistance = Integer.MAX_VALUE;
-        this.transforms = new ArrayList<>();
+        new ArrayList<>();
         this.minWords = new ArrayList<>();
         this.maxWordCounts = new HashMap<>();
     }
@@ -174,7 +170,6 @@ public class DistlePlayer {
     public void getFeedback(String guess, int editDistance, List<String> transforms) {
         if (editDistance < this.editDistance) {
             this.editDistance = editDistance;
-            this.transforms = transforms;
             this.minWords = new ArrayList<>();
             this.minWords.add(guess);
             Set<Character> excludeChars = new HashSet<>();
