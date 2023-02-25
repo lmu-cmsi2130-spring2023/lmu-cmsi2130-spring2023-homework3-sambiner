@@ -70,11 +70,11 @@ public class DistlePlayer {
         } else {
             List<String> possibleWords = getPossibleWords();
             int maxCount = 0;
-            for (String w : possibleWords) {
-                int count = getWordCount(w);
+            for (String word : possibleWords) {
+                int count = getWordCount(word);
                 if (count > maxCount) {
                     maxCount = count;
-                    this.word = w;
+                    this.word = word;
                 }
             }
         }
