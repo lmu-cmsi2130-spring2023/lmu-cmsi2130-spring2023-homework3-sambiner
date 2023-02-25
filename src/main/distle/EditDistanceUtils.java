@@ -14,19 +14,22 @@ public class EditDistanceUtils {
      * @return Completed Memoization structure for editDistance(s0, s1)
      */
     public static int[][] getEditDistTable(String s0, String s1) {
-        int[][] table = new int[s0.length() + 1][s1.length() + 1];
-        for (int i = 0; i <= s0.length(); i++) {
+        int m = s0.length();
+        int n = s1.length();
+        int[][] table = new int[m + 1][n + 1];
+        for (int i = 0; i <= m; i++) {
             table[i][0] = i;
         }
-        for (int j = 0; j <= s1.length(); j++) {
+        for (int j = 0; j <= n; j++) {
             table[0][j] = j;
         }
-        for (int i = 1; i <= s0.length(); i++) {
-            for (int j = 1; j <= s1.length(); j++) {
+
+        for (int i = 1; i <= m; i++) {
+            for (int j = 1; j <= n; j++) {
                 if (s0.charAt(i - 1) == s1.charAt(j - 1)) {
                     table[i][j] = table[i - 1][j - 1];
                 } else {
-                    table[i][j] = Math.min(table[i - 1][j - 1], Math.min(table[i - 1][j], table[i][j - 1])) + 1;
+                    table[i][j] = 1 + Math.min(table[i - 1][j - 1], Math.min(table[i - 1][j], table[i][j - 1]));
                 }
             }
         }
@@ -74,12 +77,12 @@ public class EditDistanceUtils {
                 list.add("T");
                 i -= 2;
                 j -= 2;
-            } else if (table[i][j] == table[i - 1][j] + 1) {
-                list.add("D");
-                i--;
             } else if (table[i][j] == table[i][j - 1] + 1) {
                 list.add("I");
                 j--;
+            } else if (table[i][j] == table[i - 1][j] + 1) {
+                list.add("D");
+                i--;
             }
         }
         while (i > 0) {
@@ -117,5 +120,4 @@ public class EditDistanceUtils {
     public static List<String> getTransformationList(String s0, String s1) {
         return getTransformationList(s0, s1, getEditDistTable(s0, s1));
     }
-
 }
