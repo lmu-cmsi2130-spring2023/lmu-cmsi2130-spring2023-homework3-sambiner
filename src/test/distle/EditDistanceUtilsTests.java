@@ -129,7 +129,7 @@ public class EditDistanceUtilsTests {
         String s0 = "",
                 s1 = "";
         System.out.print("Test 0 s0 -> s1 = ");
-        System.out.println(getTransformationList(s0, s1));
+        // System.out.println(getTransformationList(s0, s1));
         assertEquals(Arrays.asList(), getTransformationList(s0, s1));
     }
 
@@ -138,9 +138,9 @@ public class EditDistanceUtilsTests {
         String s0 = "a",
                 s1 = "";
         System.out.print("Test 1 s0 -> s1 = ");
-        System.out.println(getTransformationList(s0, s1));
+        // System.out.println(getTransformationList(s0, s1));
         System.out.print("Test 1 s1 -> s0 = ");
-        System.out.println(getTransformationList(s1, s0));
+        // System.out.println(getTransformationList(s1, s0));
         assertEquals(Arrays.asList("D"), getTransformationList(s0, s1));
         assertEquals(Arrays.asList("I"), getTransformationList(s1, s0));
     }

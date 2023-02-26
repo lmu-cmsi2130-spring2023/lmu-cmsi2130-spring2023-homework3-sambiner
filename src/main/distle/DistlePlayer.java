@@ -15,6 +15,7 @@ public class DistlePlayer {
     private int editDistance;
     private List<String> minWords;
     private Map<String, Integer> maxWordCounts;
+    private Map<String, Map<String, Integer>> editDistanceMemo;
 
     /**
      * Constructs a new DistlePlayer.
@@ -33,6 +34,7 @@ public class DistlePlayer {
         new ArrayList<>();
         this.minWords = new ArrayList<>();
         this.maxWordCounts = new HashMap<>();
+        this.editDistanceMemo = new HashMap<>();
     }
 
     /**
@@ -52,6 +54,7 @@ public class DistlePlayer {
         new ArrayList<>();
         this.minWords = new ArrayList<>();
         this.maxWordCounts = new HashMap<>();
+        this.editDistanceMemo = new HashMap<>();
     }
 
     /**
@@ -94,19 +97,15 @@ public class DistlePlayer {
     }
 
     private int getWordCount(String word) {
-
         if (!this.maxWordCounts.containsKey(word)) {
             int count = 0;
-
             for (String w : this.dictionary) {
-                if (getEditDistance(word, w) <= this.editDistance) {
+                if (getEditDistanceMemoized(word, w, editDistanceMemo) <= this.editDistance) {
                     count++;
                 }
             }
-
             this.maxWordCounts.put(word, count);
         }
-
         return this.maxWordCounts.get(word);
     }
 
@@ -126,25 +125,22 @@ public class DistlePlayer {
      * @return The edit distance between the two words.
      */
     private int getEditDistance(String word1, String word2) {
-        int m = word1.length();
-        int n = word2.length();
-        int[][] table = new int[m + 1][n + 1];
+        return EditDistanceUtils.editDistance(word1, word2);
+    }
 
-        for (int i = 0; i <= m; i++) {
-            table[i][0] = 0;
+    private int getEditDistanceMemoized(String word1, String word2, Map<String, Map<String, Integer>> memo) {
+        if (memo.containsKey(word1) && memo.get(word1).containsKey(word2)) {
+            return memo.get(word1).get(word2);
+        } else if (memo.containsKey(word2) && memo.get(word2).containsKey(word1)) {
+            return memo.get(word2).get(word1);
+        } else {
+            int editDistance = editDistance(word1, word2);
+            memo.putIfAbsent(word1, new HashMap<>());
+            memo.putIfAbsent(word2, new HashMap<>());
+            memo.get(word1).put(word2, editDistance);
+            memo.get(word2).put(word1, editDistance);
+            return editDistance;
         }
-
-        for (int j = 0; j <= n; j++) {
-            table[0][j] = 0;
-        }
-
-        for (int i = 1; i <= m; i++) {
-            for (int j = 1; j <= n; j++) {
-                int cost = word1.charAt(i - 1) == word2.charAt(j - 1) ? 0 : 1;
-                table[i][j] = Math.min(Math.min(table[i - 1][j] + 1, table[i][j - 1] + 1), table[i - 1][j - 1] + cost);
-            }
-        }
-        return table[m][n];
     }
 
     /**
@@ -174,7 +170,6 @@ public class DistlePlayer {
             this.minWords.add(guess);
             Set<Character> excludeChars = new HashSet<>();
             boolean excludeTransposed = false;
-
             for (String transform : transforms) {
                 if (transform.startsWith("-")) {
                     excludeChars.add(transform.charAt(1));
@@ -182,23 +177,19 @@ public class DistlePlayer {
                     excludeTransposed = true;
                 }
             }
-
             Iterator<String> it = dictionary.iterator();
             while (it.hasNext()) {
                 String word = it.next();
-
                 for (char ch : excludeChars) {
                     if (word.indexOf(ch) >= 0) {
                         it.remove();
                         break;
                     }
                 }
-
-                if (excludeTransposed && getTransformationList(guess, word).contains("T")) {
+                if (excludeTransposed && EditDistanceUtils.getTransformationList(guess, word).contains("T")) {
                     it.remove();
                 }
             }
-
         } else if (editDistance == this.editDistance) {
             this.minWords.add(guess);
         }

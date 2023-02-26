@@ -17,9 +17,11 @@ public class EditDistanceUtils {
         int m = s0.length();
         int n = s1.length();
         int[][] table = new int[m + 1][n + 1];
+
         for (int i = 0; i <= m; i++) {
             table[i][0] = i;
         }
+
         for (int j = 0; j <= n; j++) {
             table[0][j] = j;
         }
@@ -91,6 +93,7 @@ public class EditDistanceUtils {
 
         List<String> replace = getTransformationList(s0.substring(0, m - 1), s1.substring(0, n - 1), table);
         replace.add("R");
+        Collections.reverse(replace);
 
         List<String> insert = getTransformationList(s0, s1.substring(0, n - 1), table);
         insert.add("I");
