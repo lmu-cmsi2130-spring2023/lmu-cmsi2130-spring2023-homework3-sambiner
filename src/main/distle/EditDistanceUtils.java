@@ -70,14 +70,12 @@ public class EditDistanceUtils {
             for (int j = 0; j < n; j++) {
                 transformations.add("I");
             }
-            Collections.reverse(transformations);
             return transformations;
         }
         if (n == 0) {
             for (int i = 0; i < m; i++) {
                 transformations.add("D");
             }
-            Collections.reverse(transformations);
             return transformations;
         }
         if (s0.charAt(m - 1) == s1.charAt(n - 1)) {
@@ -88,7 +86,6 @@ public class EditDistanceUtils {
         if (m > 1 && n > 1 && s0.charAt(m - 1) == s1.charAt(n - 2) && s0.charAt(m - 2) == s1.charAt(n - 1)) {
             List<String> transposed = getTransformationList(s0.substring(0, m - 2), s1.substring(0, n - 2), table);
             transposed.add("T");
-            Collections.reverse(transposed);
             return transposed;
         }
 
