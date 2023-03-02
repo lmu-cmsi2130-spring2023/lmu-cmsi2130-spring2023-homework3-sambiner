@@ -17,25 +17,21 @@ public class EditDistanceUtils {
         int m = s0.length();
         int n = s1.length();
         int[][] table = new int[m + 1][n + 1];
-
         if (m == 0) {
             for (int j = 0; j <= n; j++) {
                 table[0][j] = j;
             }
             return table;
         }
-
         if (n == 0) {
             for (int i = 0; i <= m; i++) {
                 table[i][0] = i;
             }
             return table;
         }
-
         for (int j = 0; j <= n; j++) {
             table[0][j] = j;
         }
-
         for (int i = 1; i <= m; i++) {
             table[i][0] = i;
             for (int j = 1; j <= n; j++) {
