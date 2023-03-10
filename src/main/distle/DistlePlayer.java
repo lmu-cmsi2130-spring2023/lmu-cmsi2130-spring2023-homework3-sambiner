@@ -129,16 +129,17 @@ public class DistlePlayer {
     }
 
     private int getEditDistanceMemoized(String word1, String word2, Map<String, Map<String, Integer>> memo) {
+        if (word1.length() > word2.length()) {
+            String temp = word1;
+            word1 = word2;
+            word2 = temp;
+        }
         if (memo.containsKey(word1) && memo.get(word1).containsKey(word2)) {
             return memo.get(word1).get(word2);
-        } else if (memo.containsKey(word2) && memo.get(word2).containsKey(word1)) {
-            return memo.get(word2).get(word1);
         } else {
             int editDistance = editDistance(word1, word2);
             memo.putIfAbsent(word1, new HashMap<>());
-            memo.putIfAbsent(word2, new HashMap<>());
             memo.get(word1).put(word2, editDistance);
-            memo.get(word2).put(word1, editDistance);
             return editDistance;
         }
     }
