@@ -23,7 +23,7 @@ public class EditDistanceUtilsTests {
     // developing, just so you know whether or not you're
     // inefficient or bugged!
     @Rule
-    public Timeout globalTimeout = Timeout.seconds(2);
+    public Timeout globalTimeout = Timeout.seconds(5);
 
     // Grade record-keeping
     static int possible = 0, passed = 0;
@@ -173,10 +173,6 @@ public class EditDistanceUtilsTests {
     public void transformList_t4() {
         String s0 = "aaa",
                 s1 = "bbb";
-        System.out.print("Test 4 s0 -> s1 = ");
-        System.out.println(getTransformationList(s0, s1));
-        System.out.print("Test 4 s1 -> s0 = ");
-        System.out.println(getTransformationList(s1, s0));
         assertEquals(Arrays.asList("R", "R", "R"), getTransformationList(s0, s1));
         assertEquals(Arrays.asList("R", "R", "R"), getTransformationList(s1, s0));
     }

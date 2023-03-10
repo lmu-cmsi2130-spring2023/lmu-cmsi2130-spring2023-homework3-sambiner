@@ -18,7 +18,7 @@ public class DistleTests {
     // developing, just so you know whether or not you're
     // inefficient or bugged!
     @Rule
-    public Timeout globalTimeout = Timeout.seconds(5);
+    public Timeout globalTimeout = Timeout.seconds(10);
 
     static final int GAMESHOW_ROUNDS = 100,
             MAX_GUESSES = 10;

@@ -14,13 +14,16 @@ public class EditDistanceUtils {
      * @return Completed Memoization structure for editDistance(s0, s1)
      */
     public static int[][] getEditDistTable(String s0, String s1) {
+
         int m = s0.length();
         int n = s1.length();
+
         Map<String, Integer> transformPriority = new HashMap<>();
         transformPriority.put("R", 1); // Replacement
         transformPriority.put("T", 2); // Transposition
         transformPriority.put("I", 3); // Insertion
         transformPriority.put("D", 4); // Deletion
+
         int[][] table = new int[m + 1][n + 1];
 
         for (int i = 0; i <= m; i++) {
@@ -74,50 +77,57 @@ public class EditDistanceUtils {
         List<String> transformations = new ArrayList<>();
         int m = s0.length();
         int n = s1.length();
-        if (m == 0) {
-            for (int j = 0; j < n; j++) {
+        int i = m;
+        int j = n;
+        while (i > 0 || j > 0) {
+            if (i > 0 && j > 0 && s0.charAt(i - 1) == s1.charAt(j - 1)) {
+                i--;
+                j--;
+                continue;
+            }
+            int cost = Integer.MAX_VALUE;
+            int replaceCost = Integer.MAX_VALUE;
+            int insertCost = Integer.MAX_VALUE;
+            int deleteCost = Integer.MAX_VALUE;
+            if (i > 0 && j > 0) {
+                replaceCost = table[i - 1][j - 1];
+                cost = replaceCost;
+            }
+            if (i > 1 && j > 1 && s0.charAt(i - 2) == s1.charAt(j - 1) && s0.charAt(i - 1) == s1.charAt(j - 2)) {
+                int transposeCost = table[i - 2][j - 2];
+                if (transposeCost < cost) {
+                    cost = transposeCost;
+                }
+            }
+            if (j > 0) {
+                insertCost = table[i][j - 1];
+                if (insertCost < cost) {
+                    cost = insertCost;
+                }
+            }
+            if (i > 0) {
+                deleteCost = table[i - 1][j];
+                if (deleteCost < cost) {
+                    cost = deleteCost;
+                }
+            }
+            if (replaceCost == cost) {
+                transformations.add("R");
+                i--;
+                j--;
+            } else if (insertCost == cost) {
                 transformations.add("I");
-            }
-            return transformations;
-        }
-        if (n == 0) {
-            for (int i = 0; i < m; i++) {
+                j--;
+            } else if (deleteCost == cost) {
                 transformations.add("D");
+                i--;
+            } else {
+                transformations.add("T");
+                i -= 2;
+                j -= 2;
             }
-            return transformations;
         }
-        if (s0.charAt(m - 1) == s1.charAt(n - 1)) {
-            transformations.addAll(getTransformationList(s0.substring(0, m - 1), s1.substring(0, n - 1), table));
-            Collections.reverse(transformations);
-            return transformations;
-        }
-        if (m > 1 && n > 1 && s0.charAt(m - 1) == s1.charAt(n - 2) && s0.charAt(m - 2) == s1.charAt(n - 1)) {
-            List<String> transposed = getTransformationList(s0.substring(0, m - 2), s1.substring(0, n - 2), table);
-            transposed.add("T");
-            return transposed;
-        }
-
-        List<String> replace = getTransformationList(s0.substring(0, m - 1), s1.substring(0, n - 1), table);
-        replace.add("R");
-        Collections.reverse(replace);
-
-        List<String> insert = getTransformationList(s0, s1.substring(0, n - 1), table);
-        insert.add("I");
-
-        List<String> delete = getTransformationList(s0.substring(0, m - 1), s1, table);
-        delete.add("D");
-
-        int replaceScore = replace.size();
-        int insertScore = insert.size() + 1;
-        int deleteScore = delete.size() + 1;
-
-        if (replaceScore <= insertScore && replaceScore <= deleteScore) {
-            return replace;
-        } else if (insertScore < replaceScore && insertScore <= deleteScore) {
-            return insert;
-        } else {
-            return delete;
-        }
+        return transformations;
     }
 
     /**
