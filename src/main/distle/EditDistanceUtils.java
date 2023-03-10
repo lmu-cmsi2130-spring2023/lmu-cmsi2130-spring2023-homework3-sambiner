@@ -16,6 +16,11 @@ public class EditDistanceUtils {
     public static int[][] getEditDistTable(String s0, String s1) {
         int m = s0.length();
         int n = s1.length();
+        Map<String, Integer> transformPriority = new HashMap<>();
+        transformPriority.put("R", 1); // Replacement
+        transformPriority.put("T", 2); // Transposition
+        transformPriority.put("I", 3); // Insertion
+        transformPriority.put("D", 4); // Deletion
         int[][] table = new int[m + 1][n + 1];
 
         for (int i = 0; i <= m; i++) {
@@ -176,4 +181,5 @@ public class EditDistanceUtils {
     public static List<String> getTransformationList(String s0, String s1) {
         return getTransformationList(s0, s1, getEditDistTable(s0, s1));
     }
+
 }
