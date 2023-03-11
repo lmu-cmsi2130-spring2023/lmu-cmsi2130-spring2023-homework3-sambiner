@@ -48,22 +48,6 @@ public class DistlePlayer {
     }
 
     /**
-     * Calculates the edit distance between two words. The edit distance is the
-     * number of edits needed to turn one word into the other. An edit can be one of
-     * the following:
-     * <ul>
-     * <li>Insertion of a character</li>
-     * <li>Deletion of a character</li>
-     * <li>Replacement of a character</li>
-     * <li>Transposition of two adjacent characters</li>
-     * </ul>
-     * 
-     * @param word1
-     * @param word2
-     * @return The edit distance between the two words.
-     */
-
-    /**
      * Called by the DistleGame after the DistlePlayer has made an incorrect guess.
      * The
      * feedback furnished is as follows:
@@ -84,13 +68,38 @@ public class DistlePlayer {
      *                     the secret word
      */
     public void getFeedback(String guess, int editDistance, List<String> transforms) {
+        double minEntropy = Double.POSITIVE_INFINITY;
+        for (String word : dictionary) {
+            List<String> transformations = getTransformationList(guess, word);
+            if (transformations.equals(transforms)) {
+                double entropy = getEntropy(word, editDistance);
+                if (entropy < minEntropy) {
+                    minEntropy = entropy;
+                }
+            }
+        }
         Iterator<String> it = dictionary.iterator();
         while (it.hasNext()) {
             String word = it.next();
             List<String> transformations = getTransformationList(guess, word);
             if (!transformations.equals(transforms)) {
                 it.remove();
+            } else {
+                double entropy = getEntropy(word, editDistance);
+                if (entropy > minEntropy) {
+                    it.remove();
+                }
             }
         }
+    }
+
+    private double getEntropy(String word, int editDistance) {
+        int wordLength = word.length();
+        double logFactorial = 0;
+        for (int i = 1; i <= wordLength; i++) {
+            logFactorial += Math.log(i);
+        }
+        double entropy = logFactorial - wordLength * Math.log(26) + editDistance * Math.log(25);
+        return entropy;
     }
 }
