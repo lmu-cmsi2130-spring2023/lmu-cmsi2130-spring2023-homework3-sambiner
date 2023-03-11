@@ -89,12 +89,13 @@ public class EditDistanceUtils {
             int replaceCost = Integer.MAX_VALUE;
             int insertCost = Integer.MAX_VALUE;
             int deleteCost = Integer.MAX_VALUE;
+            int transposeCost = Integer.MAX_VALUE;
             if (i > 0 && j > 0) {
                 replaceCost = table[i - 1][j - 1];
                 cost = replaceCost;
             }
             if (i > 1 && j > 1 && s0.charAt(i - 2) == s1.charAt(j - 1) && s0.charAt(i - 1) == s1.charAt(j - 2)) {
-                int transposeCost = table[i - 2][j - 2];
+                transposeCost = table[i - 2][j - 2];
                 if (transposeCost < cost) {
                     cost = transposeCost;
                 }
@@ -115,16 +116,16 @@ public class EditDistanceUtils {
                 transformations.add("R");
                 i--;
                 j--;
+            } else if (transposeCost == cost) {
+                transformations.add("T");
+                j -= 2;
+                i -= 2;
             } else if (insertCost == cost) {
                 transformations.add("I");
                 j--;
-            } else if (deleteCost == cost) {
+            } else {
                 transformations.add("D");
                 i--;
-            } else {
-                transformations.add("T");
-                i -= 2;
-                j -= 2;
             }
         }
         return transformations;
@@ -141,48 +142,10 @@ public class EditDistanceUtils {
      * @return The minimal number of manipulations required to turn s0 into s1
      */
     public static int editDistance(String s0, String s1) {
-        int m = s0.length();
-        int n = s1.length();
-        if (m == 0) {
-            return n;
+        if (s0.equals(s1)) {
+            return 0;
         }
-        if (n == 0) {
-            return m;
-        }
-
-        int[][] table = new int[m + 1][n + 1];
-
-        for (int i = 0; i <= m; i++) {
-            table[i][0] = i;
-        }
-        for (int j = 0; j <= n; j++) {
-            table[0][j] = j;
-        }
-
-        for (int i = 1; i <= m; i++) {
-            for (int j = 1; j <= n; j++) {
-                if (s0.charAt(i - 1) == s1.charAt(j - 1)) {
-                    table[i][j] = table[i - 1][j - 1];
-                } else {
-                    int replace = table[i - 1][j - 1];
-                    int insert = table[i][j - 1];
-                    int delete = table[i - 1][j];
-                    int transpose = Integer.MAX_VALUE;
-
-                    if (i > 1 && j > 1 && s0.charAt(i - 2) == s1.charAt(j - 1)
-                            && s0.charAt(i - 1) == s1.charAt(j - 2)) {
-                        transpose = table[i - 2][j - 2];
-                    }
-
-                    int min = Math.min(replace, Math.min(insert, delete));
-                    min = Math.min(min, transpose);
-
-                    table[i][j] = min + 1;
-                }
-            }
-        }
-
-        return table[m][n];
+        return getEditDistTable(s0, s1)[s0.length()][s1.length()];
     }
 
     /**

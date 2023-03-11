@@ -193,10 +193,13 @@ public class EditDistanceUtilsTests {
     public void transformList_t6() {
         String s0 = "hack",
                 s1 = "fkc";
-        System.out.print("Test 6 s0 -> s1 = ");
-        System.out.println(getTransformationList(s0, s1));
-        System.out.print("Test 6 s1 -> s0 = ");
-        System.out.println(getTransformationList(s1, s0));
+        int[][] distTable = getEditDistTable(s0, s1);
+        for (int i = 0; i < s0.length() + 1; i++) {
+            for (int j = 0; j < s1.length() + 1; j++) {
+                System.out.print(distTable[i][j] + " ");
+            }
+            System.out.println();
+        }
         assertEquals(Arrays.asList("T", "R", "D"), getTransformationList(s0, s1));
         assertEquals(Arrays.asList("T", "R", "I"), getTransformationList(s1, s0));
     }
