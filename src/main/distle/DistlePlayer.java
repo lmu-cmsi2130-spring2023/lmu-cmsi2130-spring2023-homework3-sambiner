@@ -9,6 +9,7 @@ import java.util.*;
  */
 public class DistlePlayer {
     private Set<String> dictionary;
+    private List<String> guessedWords;
 
     /**
      * Constructs a new DistlePlayer.
@@ -34,6 +35,7 @@ public class DistlePlayer {
      */
     public void startNewGame(Set<String> dictionary, int maxGuesses) {
         this.dictionary = dictionary;
+        this.guessedWords = new ArrayList<>();
     }
 
     /**
@@ -44,7 +46,38 @@ public class DistlePlayer {
      */
 
     public String makeGuess() {
-        return this.dictionary.stream().findFirst().orElse(null);
+        // Calculate letter frequencies for remaining words in dictionary
+        Map<Character, Integer> freqMap = new HashMap<>();
+        for (String word : dictionary) {
+            for (char c : word.toCharArray()) {
+                freqMap.put(c, freqMap.getOrDefault(c, 0) + 1);
+            }
+        }
+
+        // Calculate weighted list of remaining words in dictionary
+        List<Pair<String, Double>> weightedWords = new ArrayList<>();
+        for (String word : dictionary) {
+            double weight = 0;
+            for (char c : word.toCharArray()) {
+                weight += freqMap.getOrDefault(c, 0);
+            }
+            weightedWords.add(new Pair<>(word, weight));
+        }
+
+        // Sort list of remaining words by weight in descending order
+        weightedWords.sort((a, b) -> Double.compare(b.getValue(), a.getValue()));
+
+        // Select highest-weight word that has not been guessed
+        for (Pair<String, Double> pair : weightedWords) {
+            String word = pair.getKey();
+            if (!guessedWords.contains(word)) {
+                guessedWords.add(word);
+                return word;
+            }
+        }
+
+        // If all words have been guessed, make a random guess
+        return dictionary.stream().findFirst().orElse(null);
     }
 
     /**
@@ -101,5 +134,23 @@ public class DistlePlayer {
         }
         double entropy = logFactorial - wordLength * Math.log(26) + editDistance * Math.log(25);
         return entropy;
+    }
+
+    private class Pair<K, V> {
+        private final K key;
+        private final V value;
+
+        public Pair(K key, V value) {
+            this.key = key;
+            this.value = value;
+        }
+
+        public K getKey() {
+            return key;
+        }
+
+        public V getValue() {
+            return value;
+        }
     }
 }
