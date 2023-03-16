@@ -34,7 +34,7 @@ public class DistleGameShow {
      * environment;
      * Should be some path that points to a dictionary file
      */
-    public static final String DICTIONARY_PATH = "./src/dat/distle/dictionary14.txt";
+    public static final String DICTIONARY_PATH = "./src/dat/distle/dictionary6.txt";
 
     /**
      * Runs some number of games of Distle based on the parameters above.

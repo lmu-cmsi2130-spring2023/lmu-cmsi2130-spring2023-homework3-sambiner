@@ -2,6 +2,8 @@ package main.distle;
 
 import static main.distle.EditDistanceUtils.*;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.stream.Collectors;
 
 /**
  * AI Distle Player! Contains all logic used to automagically play the game of
@@ -101,29 +103,20 @@ public class DistlePlayer {
      *                     the secret word
      */
     public void getFeedback(String guess, int editDistance, List<String> transforms) {
-        double minEntropy = Double.POSITIVE_INFINITY;
+        AtomicReference<Double> minEntropy = new AtomicReference<>(Double.POSITIVE_INFINITY);
+        Set<String> validWords = new HashSet<>();
         for (String word : dictionary) {
             List<String> transformations = getTransformationList(guess, word);
             if (transformations.equals(transforms)) {
+                validWords.add(word);
                 double entropy = getEntropy(word, editDistance);
-                if (entropy < minEntropy) {
-                    minEntropy = entropy;
+                if (entropy < minEntropy.get()) {
+                    minEntropy.set(entropy);
                 }
             }
         }
-        Iterator<String> it = dictionary.iterator();
-        while (it.hasNext()) {
-            String word = it.next();
-            List<String> transformations = getTransformationList(guess, word);
-            if (!transformations.equals(transforms)) {
-                it.remove();
-            } else {
-                double entropy = getEntropy(word, editDistance);
-                if (entropy > minEntropy) {
-                    it.remove();
-                }
-            }
-        }
+        dictionary = validWords.stream().filter(word -> getEntropy(word, editDistance) <= minEntropy.get())
+                .collect(Collectors.toSet());
     }
 
     private double getEntropy(String word, int editDistance) {

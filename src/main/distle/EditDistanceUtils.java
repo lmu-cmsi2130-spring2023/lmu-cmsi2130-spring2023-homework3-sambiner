@@ -154,5 +154,4 @@ public class EditDistanceUtils {
     public static List<String> getTransformationList(String s0, String s1) {
         return getTransformationList(s0, s1, getEditDistTable(s0, s1));
     }
-
 }
