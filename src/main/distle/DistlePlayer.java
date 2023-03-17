@@ -42,36 +42,12 @@ public class DistlePlayer {
     /**
      * Requests a new guess to be made in the current game of Distle. Uses the
      * DistlePlayer's fields to arrive at this decision.
+     * Uses maps to store character frequencies and word lengths, and then finds the
+     * most frequent word length. Then, it finds the most frequent characters in
+     * words of that length. It then scores all remaining words of that length and
+     * selects the word with the highest score that has not been guessed before.
      * 
      * @return The next guess from this DistlePlayer.
-     */
-
-    /**
-     * 
-     * This method uses a heuristic to select the best guess by first determining
-     * the most frequent word length in the dictionary, and then selecting the most
-     * frequent letters from words of that length. The method then scores all
-     * remaining words of the most frequent length by counting the frequency of the
-     * selected letters in each word, and selects the word with the highest score
-     * that has not been guessed before. This heuristic aims to select the most
-     * likely word based on the most common patterns in the dictionary.
-     * The method first constructs a map of character frequencies and a map of word
-     * lengths to sets of words of that length in the dictionary. It then finds the
-     * most frequent word length by selecting the length with the largest set of
-     * words. The method then extracts all words of the most frequent length and
-     * counts
-     * the frequency of each character in those words.
-     * 
-     * It sorts the character frequencies in descending order and scores all
-     * remaining words of
-     * the most frequent
-     * length by adding the frequencies of the selected characters in each word. The
-     * method selects
-     * the word with the highest score that has not been guessed before and adds it
-     * to the set of
-     * guessed words.
-     * 
-     * @return the best guess word according to the heuristic
      */
 
     public String makeGuess() {
@@ -82,7 +58,6 @@ public class DistlePlayer {
             lengthMap.putIfAbsent(length, new HashSet<>());
             lengthMap.get(length).add(word);
         }
-
         int mostFrequentWordLength = -1;
         int maxCount = -1;
         for (Map.Entry<Integer, Set<String>> entry : lengthMap.entrySet()) {
@@ -91,7 +66,6 @@ public class DistlePlayer {
                 mostFrequentWordLength = entry.getKey();
             }
         }
-
         Set<String> mostFrequentLengthWords = lengthMap.get(mostFrequentWordLength);
         for (String word : mostFrequentLengthWords) {
             for (char c : word.toCharArray()) {
@@ -99,9 +73,11 @@ public class DistlePlayer {
             }
         }
 
+        // Sort character frequencies in descending order
         List<Map.Entry<Character, Integer>> sortedFrequencies = new ArrayList<>(freqMap.entrySet());
         sortedFrequencies.sort((a, b) -> b.getValue().compareTo(a.getValue()));
 
+        // Score all remaining words of most frequent length
         String bestGuess = null;
         int bestGuessScore = -1;
         for (String word : mostFrequentLengthWords) {
@@ -112,6 +88,7 @@ public class DistlePlayer {
                     score += entry.getValue();
                 }
             }
+            // Select word with highest score that has not been guessed before
             if (score > bestGuessScore && !guessedWords.contains(word)) {
                 bestGuessScore = score;
                 bestGuess = word;
@@ -141,8 +118,14 @@ public class DistlePlayer {
      *                     the secret word
      */
     public void getFeedback(String guess, int editDistance, List<String> transforms) {
+
+        // Update dictionary to only contain words that can be transformed into the
+        // guess
         AtomicReference<Double> minEntropy = new AtomicReference<>(Double.POSITIVE_INFINITY);
         Set<String> validWords = new HashSet<>();
+
+        // Iterate through dictionary and add words that can be transformed into the
+        // guess to validWords
         for (String word : dictionary) {
             List<String> transformations = getTransformationList(guess, word);
             if (transformations.equals(transforms)) {
@@ -153,10 +136,21 @@ public class DistlePlayer {
                 }
             }
         }
+
+        // Update dictionary to only contain words with entropy less than or equal to
+        // the minimum entropy
         dictionary = validWords.stream().filter(word -> getEntropy(word, editDistance) <= minEntropy.get())
                 .collect(Collectors.toSet());
     }
 
+    /**
+     * Returns a list of top-down transforms needed to turn the guess into the
+     * secret word.
+     * 
+     * @param word         The word that we need to get the entropy of
+     * @param editDistance The edit distance between the guess and the secret word
+     * @return The entropy of the word based on the edit distance
+     */
     private double getEntropy(String word, int editDistance) {
         int wordLength = word.length();
         double logFactorial = 0;

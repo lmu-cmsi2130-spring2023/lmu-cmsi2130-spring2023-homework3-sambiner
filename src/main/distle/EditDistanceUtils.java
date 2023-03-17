@@ -15,8 +15,8 @@ public class EditDistanceUtils {
      */
     public static int[][] getEditDistTable(String s0, String s1) {
 
-        int m = s0.length();
-        int n = s1.length();
+        int len0 = s0.length();
+        int len1 = s1.length();
 
         Map<String, Integer> transformPriority = new HashMap<>();
         transformPriority.put("R", 1); // Replacement
@@ -24,18 +24,18 @@ public class EditDistanceUtils {
         transformPriority.put("I", 3); // Insertion
         transformPriority.put("D", 4); // Deletion
 
-        int[][] table = new int[m + 1][n + 1];
+        int[][] table = new int[len0 + 1][len1 + 1];
 
-        for (int i = 0; i <= m; i++) {
+        for (int i = 0; i <= len0; i++) {
             table[i][0] = i;
         }
 
-        for (int j = 1; j <= n; j++) {
+        for (int j = 1; j <= len1; j++) {
             table[0][j] = j;
         }
 
-        for (int i = 1; i <= m; i++) {
-            for (int j = 1; j <= n; j++) {
+        for (int i = 1; i <= len0; i++) {
+            for (int j = 1; j <= len1; j++) {
                 int cost = (s0.charAt(i - 1) == s1.charAt(j - 1)) ? 0 : 1;
                 table[i][j] = Math.min(table[i - 1][j] + 1, Math.min(table[i][j - 1] + 1, table[i - 1][j - 1] + cost));
                 if (i > 1 && j > 1 && s0.charAt(i - 1) == s1.charAt(j - 2) && s0.charAt(i - 2) == s1.charAt(j - 1)) {
@@ -75,14 +75,14 @@ public class EditDistanceUtils {
 
     public static List<String> getTransformationList(String s0, String s1, int[][] table) {
         List<String> transformations = new ArrayList<>();
-        int m = s0.length();
-        int n = s1.length();
-        int i = m;
-        int j = n;
-        while (i > 0 || j > 0) {
-            if (i > 0 && j > 0 && s0.charAt(i - 1) == s1.charAt(j - 1)) {
-                i--;
-                j--;
+        int len0 = s0.length();
+        int len1 = s1.length();
+        int row = len0;
+        int col = len1;
+        while (row > 0 || col > 0) {
+            if (row > 0 && col > 0 && s0.charAt(row - 1) == s1.charAt(col - 1)) {
+                row--;
+                col--;
                 continue;
             }
             int cost = Integer.MAX_VALUE;
@@ -90,42 +90,43 @@ public class EditDistanceUtils {
             int insertCost = Integer.MAX_VALUE;
             int deleteCost = Integer.MAX_VALUE;
             int transposeCost = Integer.MAX_VALUE;
-            if (i > 0 && j > 0) {
-                replaceCost = table[i - 1][j - 1];
+            if (row > 0 && col > 0) {
+                replaceCost = table[row - 1][col - 1];
                 cost = replaceCost;
             }
-            if (i > 1 && j > 1 && s0.charAt(i - 2) == s1.charAt(j - 1) && s0.charAt(i - 1) == s1.charAt(j - 2)) {
-                transposeCost = table[i - 2][j - 2];
+            if (row > 1 && col > 1 && s0.charAt(row - 2) == s1.charAt(col - 1)
+                    && s0.charAt(row - 1) == s1.charAt(col - 2)) {
+                transposeCost = table[row - 2][col - 2];
                 if (transposeCost < cost) {
                     cost = transposeCost;
                 }
             }
-            if (j > 0) {
-                insertCost = table[i][j - 1];
+            if (col > 0) {
+                insertCost = table[row][col - 1];
                 if (insertCost < cost) {
                     cost = insertCost;
                 }
             }
-            if (i > 0) {
-                deleteCost = table[i - 1][j];
+            if (row > 0) {
+                deleteCost = table[row - 1][col];
                 if (deleteCost < cost) {
                     cost = deleteCost;
                 }
             }
             if (replaceCost == cost) {
                 transformations.add("R");
-                i--;
-                j--;
+                row--;
+                col--;
             } else if (transposeCost == cost) {
                 transformations.add("T");
-                j -= 2;
-                i -= 2;
+                col -= 2;
+                row -= 2;
             } else if (insertCost == cost) {
                 transformations.add("I");
-                j--;
+                col--;
             } else {
                 transformations.add("D");
-                i--;
+                row--;
             }
         }
         return transformations;
