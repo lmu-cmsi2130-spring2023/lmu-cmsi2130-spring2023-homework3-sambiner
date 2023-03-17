@@ -19,8 +19,7 @@ public class DistlePlayer {
      * arguments.
      * Still, you can use this constructor to initialize any fields that need to be,
      * though you may prefer to do this in the {@link #startNewGame(Set<String>
-     * dictionary, int maxGuesses)}
-     * method.
+     * dictionary, int maxGuesses)} method.
      */
     public DistlePlayer() {
         this.dictionary = new HashSet<>();
@@ -47,48 +46,85 @@ public class DistlePlayer {
      * @return The next guess from this DistlePlayer.
      */
 
+    /**
+     * 
+     * This method uses a heuristic to select the best guess by first determining
+     * the most frequent word length in the dictionary, and then selecting the most
+     * frequent letters from words of that length. The method then scores all
+     * remaining words of the most frequent length by counting the frequency of the
+     * selected letters in each word, and selects the word with the highest score
+     * that has not been guessed before. This heuristic aims to select the most
+     * likely word based on the most common patterns in the dictionary.
+     * The method first constructs a map of character frequencies and a map of word
+     * lengths to sets of words of that length in the dictionary. It then finds the
+     * most frequent word length by selecting the length with the largest set of
+     * words. The method then extracts all words of the most frequent length and
+     * counts
+     * the frequency of each character in those words.
+     * 
+     * It sorts the character frequencies in descending order and scores all
+     * remaining words of
+     * the most frequent
+     * length by adding the frequencies of the selected characters in each word. The
+     * method selects
+     * the word with the highest score that has not been guessed before and adds it
+     * to the set of
+     * guessed words.
+     * 
+     * @return the best guess word according to the heuristic
+     */
+
     public String makeGuess() {
-        Map<String, Integer> bigramCounts = new HashMap<>();
-
+        Map<Character, Integer> freqMap = new HashMap<>();
+        Map<Integer, Set<String>> lengthMap = new HashMap<>();
         for (String word : dictionary) {
-            for (int i = 0; i < word.length() - 1; i++) {
-                String bigram = word.substring(i, i + 2);
-                bigramCounts.put(bigram, bigramCounts.getOrDefault(bigram, 0) + 1);
+            int length = word.length();
+            lengthMap.putIfAbsent(length, new HashSet<>());
+            lengthMap.get(length).add(word);
+        }
+
+        int mostFrequentWordLength = -1;
+        int maxCount = -1;
+        for (Map.Entry<Integer, Set<String>> entry : lengthMap.entrySet()) {
+            if (entry.getValue().size() > maxCount) {
+                maxCount = entry.getValue().size();
+                mostFrequentWordLength = entry.getKey();
             }
         }
 
-        List<String> sortedWords = new ArrayList<>(dictionary);
-        sortedWords.sort((a, b) -> {
-            double aWeight = 0;
-            double bWeight = 0;
-
-            for (int i = 0; i < a.length() - 1; i++) {
-                String bigram = a.substring(i, i + 2);
-                aWeight += bigramCounts.getOrDefault(bigram, 0);
-            }
-
-            for (int i = 0; i < b.length() - 1; i++) {
-                String bigram = b.substring(i, i + 2);
-                bWeight += bigramCounts.getOrDefault(bigram, 0);
-            }
-
-            return Double.compare(bWeight, aWeight);
-        });
-
-        for (String word : sortedWords) {
-            if (!guessedWords.contains(word)) {
-                guessedWords.add(word);
-                return word;
+        Set<String> mostFrequentLengthWords = lengthMap.get(mostFrequentWordLength);
+        for (String word : mostFrequentLengthWords) {
+            for (char c : word.toCharArray()) {
+                freqMap.put(c, freqMap.getOrDefault(c, 0) + 1);
             }
         }
 
-        return dictionary.stream().findFirst().orElse(null);
+        List<Map.Entry<Character, Integer>> sortedFrequencies = new ArrayList<>(freqMap.entrySet());
+        sortedFrequencies.sort((a, b) -> b.getValue().compareTo(a.getValue()));
+
+        String bestGuess = null;
+        int bestGuessScore = -1;
+        for (String word : mostFrequentLengthWords) {
+            int score = 0;
+            for (Map.Entry<Character, Integer> entry : sortedFrequencies) {
+                char c = entry.getKey();
+                if (word.indexOf(c) >= 0) {
+                    score += entry.getValue();
+                }
+            }
+            if (score > bestGuessScore && !guessedWords.contains(word)) {
+                bestGuessScore = score;
+                bestGuess = word;
+            }
+        }
+
+        guessedWords.add(bestGuess);
+        return bestGuess;
     }
 
     /**
      * Called by the DistleGame after the DistlePlayer has made an incorrect guess.
-     * The
-     * feedback furnished is as follows:
+     * The feedback furnished is as follows:
      * <ul>
      * <li>guess, the player's incorrect guess (repeated here for convenience)</li>
      * <li>editDistance, the numerical edit distance between the guess and secret
@@ -97,8 +133,7 @@ public class DistlePlayer {
      * the secret word</li>
      * </ul>
      * [!] This method should be used by the DistlePlayer to update its fields and
-     * plan for
-     * the next guess to be made.
+     * plan for the next guess to be made.
      * 
      * @param guess        The last, incorrect, guess made by the DistlePlayer
      * @param editDistance Numerical distance between the guess and the secret word
