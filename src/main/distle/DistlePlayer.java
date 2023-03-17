@@ -48,37 +48,40 @@ public class DistlePlayer {
      */
 
     public String makeGuess() {
-        // Calculate letter frequencies for remaining words in dictionary
-        Map<Character, Integer> freqMap = new HashMap<>();
+        Map<String, Integer> bigramCounts = new HashMap<>();
+
         for (String word : dictionary) {
-            for (char c : word.toCharArray()) {
-                freqMap.put(c, freqMap.getOrDefault(c, 0) + 1);
+            for (int i = 0; i < word.length() - 1; i++) {
+                String bigram = word.substring(i, i + 2);
+                bigramCounts.put(bigram, bigramCounts.getOrDefault(bigram, 0) + 1);
             }
         }
 
-        // Calculate weighted list of remaining words in dictionary
-        List<Pair<String, Double>> weightedWords = new ArrayList<>();
-        for (String word : dictionary) {
-            double weight = 0;
-            for (char c : word.toCharArray()) {
-                weight += freqMap.getOrDefault(c, 0);
+        List<String> sortedWords = new ArrayList<>(dictionary);
+        sortedWords.sort((a, b) -> {
+            double aWeight = 0;
+            double bWeight = 0;
+
+            for (int i = 0; i < a.length() - 1; i++) {
+                String bigram = a.substring(i, i + 2);
+                aWeight += bigramCounts.getOrDefault(bigram, 0);
             }
-            weightedWords.add(new Pair<>(word, weight));
-        }
 
-        // Sort list of remaining words by weight in descending order
-        weightedWords.sort((a, b) -> Double.compare(b.getValue(), a.getValue()));
+            for (int i = 0; i < b.length() - 1; i++) {
+                String bigram = b.substring(i, i + 2);
+                bWeight += bigramCounts.getOrDefault(bigram, 0);
+            }
 
-        // Select highest-weight word that has not been guessed
-        for (Pair<String, Double> pair : weightedWords) {
-            String word = pair.getKey();
+            return Double.compare(bWeight, aWeight);
+        });
+
+        for (String word : sortedWords) {
             if (!guessedWords.contains(word)) {
                 guessedWords.add(word);
                 return word;
             }
         }
 
-        // If all words have been guessed, make a random guess
         return dictionary.stream().findFirst().orElse(null);
     }
 
@@ -127,23 +130,5 @@ public class DistlePlayer {
         }
         double entropy = logFactorial - wordLength * Math.log(26) + editDistance * Math.log(25);
         return entropy;
-    }
-
-    private class Pair<K, V> {
-        private final K key;
-        private final V value;
-
-        public Pair(K key, V value) {
-            this.key = key;
-            this.value = value;
-        }
-
-        public K getKey() {
-            return key;
-        }
-
-        public V getValue() {
-            return value;
-        }
     }
 }
