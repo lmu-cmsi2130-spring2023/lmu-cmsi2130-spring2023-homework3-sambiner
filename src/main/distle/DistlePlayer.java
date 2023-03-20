@@ -51,6 +51,7 @@ public class DistlePlayer {
      */
 
     public String makeGuess() {
+
         Map<Character, Integer> freqMap = new HashMap<>();
         Map<Integer, Set<String>> lengthMap = new HashMap<>();
         for (String word : dictionary) {
@@ -58,6 +59,7 @@ public class DistlePlayer {
             lengthMap.putIfAbsent(length, new HashSet<>());
             lengthMap.get(length).add(word);
         }
+
         int mostFrequentWordLength = -1;
         int maxCount = -1;
         for (Map.Entry<Integer, Set<String>> entry : lengthMap.entrySet()) {
@@ -66,6 +68,7 @@ public class DistlePlayer {
                 mostFrequentWordLength = entry.getKey();
             }
         }
+
         Set<String> mostFrequentLengthWords = lengthMap.get(mostFrequentWordLength);
         for (String word : mostFrequentLengthWords) {
             for (char c : word.toCharArray()) {
@@ -73,11 +76,9 @@ public class DistlePlayer {
             }
         }
 
-        // Sort character frequencies in descending order
         List<Map.Entry<Character, Integer>> sortedFrequencies = new ArrayList<>(freqMap.entrySet());
         sortedFrequencies.sort((a, b) -> b.getValue().compareTo(a.getValue()));
 
-        // Score all remaining words of most frequent length
         String bestGuess = null;
         int bestGuessScore = -1;
         for (String word : mostFrequentLengthWords) {
@@ -88,7 +89,6 @@ public class DistlePlayer {
                     score += entry.getValue();
                 }
             }
-            // Select word with highest score that has not been guessed before
             if (score > bestGuessScore && !guessedWords.contains(word)) {
                 bestGuessScore = score;
                 bestGuess = word;

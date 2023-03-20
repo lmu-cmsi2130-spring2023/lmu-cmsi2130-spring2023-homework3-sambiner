@@ -14,7 +14,7 @@ public class DistleGameShow {
      * N_GAMES = number of new games to be played
      */
     public static final int MAX_GUESSES = 10,
-            N_GAMES = 1;
+            N_GAMES = 100;
 
     /**
      * WORD = correct answer; leave null for a random word
@@ -26,7 +26,7 @@ public class DistleGameShow {
      * AI_PLAYER = true to have your DistlePlayer on the show, false to play
      * yourself
      */
-    public static boolean VERBOSE = true,
+    public static boolean VERBOSE = false,
             AI_PLAYER = true;
 
     /**
