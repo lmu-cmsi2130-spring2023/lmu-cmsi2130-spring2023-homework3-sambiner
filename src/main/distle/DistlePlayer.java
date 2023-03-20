@@ -22,7 +22,7 @@ public class DistlePlayer {
      * dictionary, int maxGuesses)} method.
      */
     public DistlePlayer() {
-        this.dictionary = new HashSet<>();
+
     }
 
     /**
@@ -34,6 +34,7 @@ public class DistlePlayer {
      *                   can be drawn.
      * @param maxGuesses The max number of guesses available to the player.
      */
+
     public void startNewGame(Set<String> dictionary, int maxGuesses) {
         this.dictionary = dictionary;
         this.guessedWords = new ArrayList<>();
