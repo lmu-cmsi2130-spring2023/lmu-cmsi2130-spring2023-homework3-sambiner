@@ -2,8 +2,6 @@ package main.distle;
 
 import static main.distle.EditDistanceUtils.*;
 import java.util.*;
-import java.util.concurrent.atomic.AtomicReference;
-import java.util.stream.Collectors;
 
 /**
  * AI Distle Player! Contains all logic used to automagically play the game of
@@ -120,45 +118,14 @@ public class DistlePlayer {
      */
     public void getFeedback(String guess, int editDistance, List<String> transforms) {
 
-        // Update dictionary to only contain words that can be transformed into the
-        // guess
-        AtomicReference<Double> minEntropy = new AtomicReference<>(Double.POSITIVE_INFINITY);
         Set<String> validWords = new HashSet<>();
-
-        // Iterate through dictionary and add words that can be transformed into the
-        // guess to validWords
         for (String word : dictionary) {
             List<String> transformations = getTransformationList(guess, word);
             if (transformations.equals(transforms)) {
                 validWords.add(word);
-                double entropy = getEntropy(word, editDistance);
-                if (entropy < minEntropy.get()) {
-                    minEntropy.set(entropy);
-                }
             }
         }
-
-        // Update dictionary to only contain words with entropy less than or equal to
-        // the minimum entropy
-        dictionary = validWords.stream().filter(word -> getEntropy(word, editDistance) <= minEntropy.get())
-                .collect(Collectors.toSet());
+        dictionary = validWords;
     }
 
-    /**
-     * Returns a list of top-down transforms needed to turn the guess into the
-     * secret word.
-     * 
-     * @param word         The word that we need to get the entropy of
-     * @param editDistance The edit distance between the guess and the secret word
-     * @return The entropy of the word based on the edit distance
-     */
-    private double getEntropy(String word, int editDistance) {
-        int wordLength = word.length();
-        double logFactorial = 0;
-        for (int i = 1; i <= wordLength; i++) {
-            logFactorial += Math.log(i);
-        }
-        double entropy = logFactorial - wordLength * Math.log(26) + editDistance * Math.log(25);
-        return entropy;
-    }
 }
