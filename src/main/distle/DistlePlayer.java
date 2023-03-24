@@ -51,6 +51,7 @@ public class DistlePlayer {
 
     public String makeGuess() {
 
+        // Create a map of character frequencies and a map of word lengths
         Map<Character, Integer> freqMap = new HashMap<>();
         Map<Integer, Set<String>> lengthMap = new HashMap<>();
         for (String word : dictionary) {
@@ -59,6 +60,7 @@ public class DistlePlayer {
             lengthMap.get(length).add(word);
         }
 
+        // Find the most frequent word length
         int mostFrequentWordLength = -1;
         int maxCount = -1;
         for (Map.Entry<Integer, Set<String>> entry : lengthMap.entrySet()) {
@@ -68,6 +70,7 @@ public class DistlePlayer {
             }
         }
 
+        // Find the most frequent characters in words of the most frequent length
         Set<String> mostFrequentLengthWords = lengthMap.get(mostFrequentWordLength);
         for (String word : mostFrequentLengthWords) {
             for (char c : word.toCharArray()) {
@@ -80,6 +83,8 @@ public class DistlePlayer {
 
         String bestGuess = null;
         int bestGuessScore = -1;
+
+        // Score each word based on how many of the most frequent characters it has
         for (String word : mostFrequentLengthWords) {
             int score = 0;
             for (Map.Entry<Character, Integer> entry : sortedFrequencies) {
@@ -117,7 +122,6 @@ public class DistlePlayer {
      *                     the secret word
      */
     public void getFeedback(String guess, int editDistance, List<String> transforms) {
-
         Set<String> validWords = new HashSet<>();
         for (String word : dictionary) {
             List<String> transformations = getTransformationList(guess, word);
@@ -125,7 +129,73 @@ public class DistlePlayer {
                 validWords.add(word);
             }
         }
-        dictionary = validWords;
+
+        Map<Integer, int[][]> wordLengthFreqs = precomputeFrequencies(validWords);
+
+        PriorityQueue<String> pq = new PriorityQueue<>(
+                (a, b) -> Double.compare(calculateEntropy(a, wordLengthFreqs, validWords),
+                        calculateEntropy(b, wordLengthFreqs, validWords)));
+
+        pq.addAll(validWords);
+
+        dictionary = new LinkedHashSet<>(pq);
+    }
+
+    /**
+     * Precomputes the frequencies of characters in words of the same length.
+     * 
+     * @param validWords: A set of words that are valid guesses.
+     * @return wordLengthFreqs: A map from word length to a 2D array of character
+     *         frequencies.
+     */
+
+    private Map<Integer, int[][]> precomputeFrequencies(Set<String> validWords) {
+        Map<Integer, int[][]> wordLengthFreqs = new HashMap<>();
+
+        for (String word : validWords) {
+            int wordLength = word.length();
+            if (!wordLengthFreqs.containsKey(wordLength)) {
+                wordLengthFreqs.put(wordLength, new int[wordLength][26]);
+            }
+
+            int[][] freqs = wordLengthFreqs.get(wordLength);
+            for (int i = 0; i < wordLength; i++) {
+                if (word.charAt(i) != '-') {
+                    freqs[i][word.charAt(i) - 'a']++;
+                }
+            }
+        }
+
+        return wordLengthFreqs;
+    }
+
+    /**
+     * Calculates the entropy of a word given the frequencies of characters in words
+     * of the same length.
+     * 
+     * @param word:            The word to calculate the entropy of
+     * @param wordLengthFreqs: The frequencies of characters in words of the same
+     *                         length
+     * @param validWords:      The set of valid words
+     * @return entropy: The entropy of the word.
+     */
+
+    private double calculateEntropy(String word, Map<Integer, int[][]> wordLengthFreqs, Set<String> validWords) {
+        int wordLength = word.length();
+        int[][] freqs = wordLengthFreqs.get(wordLength);
+
+        double entropy = 0;
+        for (int i = 0; i < wordLength; i++) {
+            if (word.charAt(i) != '-') {
+                int charFreq = freqs[i][word.charAt(i) - 'a'];
+                if (charFreq != 0) {
+                    double probability = (double) charFreq / validWords.size();
+                    entropy -= probability * Math.log(probability) / Math.log(2);
+                }
+            }
+        }
+
+        return entropy;
     }
 
 }
