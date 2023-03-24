@@ -39,12 +39,9 @@ public class DistlePlayer {
     }
 
     /**
-     * Requests a new guess to be made in the current game of Distle. Uses the
-     * DistlePlayer's fields to arrive at this decision.
-     * Uses maps to store character frequencies and word lengths, and then finds the
-     * most frequent word length. Then, it finds the most frequent characters in
-     * words of that length. It then scores all remaining words of that length and
-     * selects the word with the highest score that has not been guessed before.
+     * Creates a new guess for the current game of Distle. This method is called
+     * repeatedly until the game is over, and the return value of this method is
+     * compared against the correct answer to determine if the guess was correct.
      * 
      * @return The next guess from this DistlePlayer.
      */
