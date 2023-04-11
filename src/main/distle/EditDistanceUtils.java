@@ -15,9 +15,14 @@ public class EditDistanceUtils {
      */
     public static int[][] getEditDistTable(String s0, String s1) {
 
+        // >> [AF] Poor variable names here that could be improved to indicate their contents
+        // and purpose; use row and col instead of single-letter placeholders like i, j, and
+        // rowLen and colLen rather than len0 and len1 so it orients the dimensions relative the table (-1)
         int len0 = s0.length();
         int len1 = s1.length();
 
+        // >> [AF] A little overengineered here, as discussed -- and wait, it looks like you never
+        // use this? Remove dead code before submission (-0.5)
         Map<String, Integer> transformPriority = new HashMap<>();
         transformPriority.put("R", 1); // Replacement
         transformPriority.put("T", 2); // Transposition
@@ -72,11 +77,14 @@ public class EditDistanceUtils {
      *         followed
      *         by a transposition, then insertion.
      */
+    // >> [AF] JavaDocs must be placed directly above the method they document (no space in between),
+    // but you added one here (-0.25)
 
     public static List<String> getTransformationList(String s0, String s1, int[][] table) {
         List<String> transformations = new ArrayList<>();
         int len0 = s0.length();
         int len1 = s1.length();
+        // >> [AF] Uhh... why not just rename len0 and len1?
         int row = len0;
         int col = len1;
         while (row > 0 || col > 0) {
@@ -97,6 +105,11 @@ public class EditDistanceUtils {
             if (row > 1 && col > 1 && s0.charAt(row - 2) == s1.charAt(col - 1)
                     && s0.charAt(row - 1) == s1.charAt(col - 2)) {
                 transposeCost = table[row - 2][col - 2];
+                // >> [AF] You shouldn't need to compare for minimums here at all since you KNOW
+                // that the table's entry at the current row and column IS the minimum (assuming it was
+                // completed correctly before being given to this method as an argument); instead, just
+                // check if the current cell is the same as one of the candidate sources in the table
+                // (making sure to add +1 where appropriate) (-0.5)
                 if (transposeCost < cost) {
                     cost = transposeCost;
                 }
@@ -156,3 +169,33 @@ public class EditDistanceUtils {
         return getTransformationList(s0, s1, getEditDistTable(s0, s1));
     }
 }
+
+// ===================================================
+// >>> [AF] Summary
+// Excellent submission that has a ton to like and was
+// obviously well-tested. Generally clean style (apart
+// from a few quibbles noted above), and shows
+// strong command of programming foundations alongside
+// data structure and algorithmic concepts. Globally, I'd
+// recommend giving yourself time to lint your code for
+// more stylistically appropriate implementations and to
+// step back whenever you feel yourself doing something
+// complicated to refactor, but by George it's hard to
+// argue with results -- nice 3rd place finish in the
+// DistlePlayer "contest." Keep up the great work!
+// ---------------------------------------------------
+// >>> [AF] Style Checklist
+// [X] = Good, [~] = Mixed bag, [ ] = Needs improvement
+//
+// [~] Variables and helper methods named and used well
+// [~] Proper and consistent indentation and spacing
+// [X] Proper JavaDocs provided for ALL methods
+// [ ] Logic is adequately simplified
+// [X] Code repetition is kept to a minimum
+// ---------------------------------------------------
+// Correctness:          100 / 100
+// -> EditDistUtils:      20 / 20  (-2 / missed test)
+// -> DistlePlayer:      290 / 265 (-0.5 / below threshold; max -30)
+// Style Penalty:      -2.25
+// Total:              97.75 / 100
+// ===================================================
